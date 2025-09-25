@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "NanoTrader",
+    "slug": "nanotrader",
+    "owner": "andreheleno11021982",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["android"],
+    "sdkVersion": "51.0.0",
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"]
+  }
+}

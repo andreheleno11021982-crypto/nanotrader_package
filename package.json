@@ -1,14 +1,16 @@
 {
-  "name": "nanotrader-app",
-  "version": "0.1.0",
+  "name": "nanotrader",
+  "version": "1.0.0",
+  "main": "index.js",
   "private": true,
   "scripts": {
-    "android": "react-native run-android"
+    "start": "expo start",
+    "android": "expo run:android"
   },
   "dependencies": {
+    "expo": "^51.0.0",
     "react": "18.2.0",
     "react-native": "0.71.8",
-    "axios": "^1.4.0"
-  },
-  "devDependencies": {}
+    "expo-status-bar": "~2.0.0"
+  }
 }
