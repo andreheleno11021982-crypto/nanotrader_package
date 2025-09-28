@@ -26,13 +26,13 @@ jobs:
         run: npm install
 
       - name: Build Android APK
-        run: |
+        run:uses: actions/upload-artifact@v4
           npx expo prebuild
           ./gradlew assembleDebug
         working-directory: android
 
-      - name: Upload APK
-  uses: actions/upload-artifact@v4
+      -- name: Upload APK
+  
 
     
         with:
