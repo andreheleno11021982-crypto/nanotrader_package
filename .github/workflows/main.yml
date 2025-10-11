@@ -1,22 +1,50 @@
+name: React Native Android CI
 
-     - name: Cache do Gradle
-        id: cache-gradle
-        uses: actions/cache@v4
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v5
+
+      - name: Configurar o Java
+        uses: actions/setup-java@v4
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          distribution: 'temurin'
+          java-version: '17'
+          # Adicione o caminho do seu projeto Android para o cache
+          # Certifique-se de que a pasta `android` exista na raiz do seu repositório
+          cache: 'gradle' 
+          cache-path: 'android/app/build/outputs' # Exemplo
+          # ou apenas 'android' dependendo da estrutura
+      
+      - name: Configurar o Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
       - name: Instalar dependências do projeto
-        if: steps.cache-gradle.outputs.cache-hit != 'true'
+        run: npm install
+
+      - name: Dar permissão de execução ao Gradle
         run: |
           cd android
-          ./gradlew dependencies
+          chmod +x ./gradlew
 
       - name: Gerar o APK de Debug
         run: |
           cd android
           ./gradlew assembleDebug
+
+      - name: Enviar o APK como um artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
