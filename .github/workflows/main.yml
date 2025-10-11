@@ -1,5 +1,6 @@
-name: Android debug build
+name: React Native Android CI
 
+# O workflow será executado quando houver um push para a branch `main`
 on:
   push:
     branches:
@@ -7,24 +8,39 @@ on:
 
 jobs:
   build:
+    # O job rodará em uma máquina virtual com Ubuntu
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout do Código
         uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: Configurar o Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17' # Use a versão do Java que seu projeto React Native usa
+
+      - name: Configurar o Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: '20' # Use a versão do Node.js que seu projeto usa
 
-      - name: Install dependencies
+      - name: Instalar dependências do projeto
         run: npm install
 
-      - name: Build APK
-        run: npx expo run:android --no-install
+      - name: Dar permissão de execução ao Gradle
+        run: |
+          cd android
+          chmod +x ./gradlew
 
-      - name: Upload artifact
+      - name: Gerar o APK de Debug
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Enviar o APK como um artefato
         uses: actions/upload-artifact@v4
         with:
-          name: nanotrader-app-debug-apk
+          name: app-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
