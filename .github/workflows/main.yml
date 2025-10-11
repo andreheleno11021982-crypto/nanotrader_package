@@ -1,46 +1,22 @@
-name: React Native Android CI
 
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout do Código
-        uses: actions/checkout@v4
-
-      - name: Configurar o Java
-        uses: actions/setup-java@v4
+     - name: Cache do Gradle
+        id: cache-gradle
+        uses: actions/cache@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle' # Adiciona cache para dependências do Gradle
-
-      - name: Configurar o Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm' # Adiciona cache para dependências do NPM
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Instalar dependências do projeto
-        run: npm install
-
-      - name: Dar permissão de execução ao Gradle
+        if: steps.cache-gradle.outputs.cache-hit != 'true'
         run: |
           cd android
-          chmod +x ./gradlew
+          ./gradlew dependencies
 
       - name: Gerar o APK de Debug
         run: |
           cd android
           ./gradlew assembleDebug
-
-      - name: Enviar o APK como um artefato
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
