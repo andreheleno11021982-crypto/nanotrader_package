@@ -1,6 +1,5 @@
 name: React Native Android CI
 
-# O workflow será executado quando houver um push para a branch `main`
 on:
   push:
     branches:
@@ -8,7 +7,6 @@ on:
 
 jobs:
   build:
-    # O job rodará em uma máquina virtual com Ubuntu
     runs-on: ubuntu-latest
 
     steps:
@@ -19,12 +17,14 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17' # Use a versão do Java que seu projeto React Native usa
+          java-version: '17'
+          cache: 'gradle' # Adiciona cache para dependências do Gradle
 
       - name: Configurar o Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Use a versão do Node.js que seu projeto usa
+          node-version: '20'
+          cache: 'npm' # Adiciona cache para dependências do NPM
 
       - name: Instalar dependências do projeto
         run: npm install
