@@ -38,4 +38,3 @@ jobs:
           name: meu-aplicativo-apk
           path: app/build/outputs
 
-
