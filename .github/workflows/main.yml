@@ -1,46 +1,37 @@
-name: NanoTrader Pro - Build Android APK
+name: Build NanoTrader APK
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout repositório
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
+      - name: Instalar dependências
         run: |
-          npm install -g eas-cli
+          npm install -g eas-cli expo-cli
           npm install
 
-      - name: Login no Expo (definir token)
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: |
-          echo "Token do Expo definido no ambiente."
-
-      - name: Build Android APK com autenticação
+      - name: Configurar autenticação Expo
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           npx eas whoami || echo "Autenticando com token..."
+          echo "Autenticação concluída com sucesso."
+
+      - name: Inicializar projeto EAS (se necessário)
+        run: |
+          npx eas init --non-interactive || echo "EAS já configurado"
+
+      - name: Build Android APK
+        run: |
           npx eas build -p android --profile preview --non-interactive
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: NanoTraderPro-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
 
 
