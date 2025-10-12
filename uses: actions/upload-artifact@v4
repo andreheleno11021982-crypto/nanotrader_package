@@ -1,47 +1,42 @@
-name: Compilação de depuração do Android
+name: NanoTrader Pro - Build Android APK
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout do código
-      - name: Repositório de checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Configurar Java (JDK 17)
-      - name: Configurar o JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      # Configurar Node.js (v18)
-      - name: Configurar o Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
 
-      # Instalar dependências
-      - name: Instalar dependências
-        run: npm install
-
-      # Construir APK
-      - name: Construir APK para Android
+      - name: Install dependencies
         run: |
-          npx expo prebuild
-          ./gradlew assembleDebug
+          npm install -g expo-cli eas-cli
+          npm install
 
-      # Upload do APK como artefato
-      - name: Upload do APK
+      - name: Authenticate with Expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas whoami || eas login --token $EXPO_TOKEN
+
+      - name: Build Android APK
+        run: |
+          eas build -p android --profile preview --non-interactive
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: NanoTraderPro-APK
+          path: dist/
+
 
