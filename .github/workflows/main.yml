@@ -1,22 +1,52 @@
 
-     - name: Cache do Gradle
+name: NanoTrader Pro - Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Cache do Gradle
         id: cache-gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}-${{ hashFiles('**/*.gradle') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Instalar dependências do projeto
-        if: steps.cache-gradle.outputs.cache-hit != 'true'
+      - name: Install dependencies
         run: |
-          cd android
-          ./gradlew dependencies
+          npm install -g expo-cli eas-cli
+          npm install
 
-      - name: Gerar o APK de Debug
+      - name: Authenticate with Expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          cd android
-          ./gradlew assembleDebug
+          eas whoami || eas login --token $EXPO_TOKEN
+
+      - name: Build Android APK
+        run: |
+          eas build -p android --profile preview --non-interactive
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NanoTraderPro-APK
+          path: dist/
