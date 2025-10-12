@@ -35,10 +35,12 @@ jobs:
           npm install
 
       - name: Authenticate with Expo
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: |
-          eas whoami || eas login --token $EXPO_TOKEN
+        
+    env:
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+run: |
+  npx expo login --token $EXPO_TOKEN
+
 
       - name: Build Android APK
         run: |
