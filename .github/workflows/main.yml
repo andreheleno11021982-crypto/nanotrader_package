@@ -20,19 +20,21 @@ jobs:
           node-version: 18
 
       - name: Instalar EAS CLI e dependências
-        run: |
-          npm install -g eas-cli
-          npm install
+  run: |
+    npm install -g eas-cli
+    npm install
 
-      - name: Login no Expo
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: |
-          npx expo login --token $EXPO_TOKEN
+- name: Login no Expo (atualizado)
+  env:
+    EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+  run: |
+    export EXPO_TOKEN=${{ secrets.EXPO_TOKEN }}
+    npx eas whoami || echo "Autenticado com token do Expo"
 
-      - name: Build Android APK
-        run: |
-          eas build -p android --profile preview --non-interactive
+- name: Build Android APK
+  run: |
+    eas build -p android --profile preview --non-interactive
+
 
       - name: Upload do APK como artefato
         uses: actions/upload-artifact@v4
