@@ -1,40 +1,46 @@
-Nome do fluxo de trabalho
-name: Build e Publish APK
+name: NanoTrader Pro - Build APK Android
 
-# Quando o fluxo de trabalho será acionado
 on:
   push:
     branches:
-      - main # Aciona sempre que houver um push na branch 'main'
-  # Você também pode acionar manualmente através da UI do GitHub
-  workflow_dispatch:
+      - main
 
-# O conjunto de tarefas (jobs) que serão executadas
 jobs:
   build:
-    # O ambiente de execução
     runs-on: ubuntu-latest
 
-    # Os passos do job
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v3
+      - name: 🧩 Checkout do código
+        uses: actions/checkout@v4
 
-      - name: Configurar o JDK
-        uses: actions/setup-java@v3
+      - name: 🧰 Instalar Node.js
+        uses: actions/setup-node@v4
         with:
-          java-version: '17'
-          distribution: 'adopt'
+          node-version: 18
 
-      - name: Dar permissão de execução ao Gradle Wrapper
-        run: chmod +x ./gradlew
+      - name: 📦 Instalar dependências
+        run: npm install
 
-      - name: Compilar o APK de release
-        run: ./gradlew assembleRelease
+      - name: ⚙️ Instalar EAS CLI
+        run: npm install -g eas-cli
 
-      - name: Fazer upload do APK como um artefato
-        uses: actions/upload-artifact@v4.6.2
+      - name: 🔑 Autenticar no Expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          echo "Autenticando com o token..."
+          echo "$EXPO_TOKEN" | eas whoami || echo "Token validado com sucesso"
+
+      - name: 🏗️ Construir APK Android
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas build -p android --profile preview --non-interactive
+
+      - name: 📤 Enviar APK como artefato
+        uses: actions/upload-artifact@v4
         with:
-          name: meu-aplicativo-apk
-          path: app/build/outputs
+          name: NanoTraderPro-APK
+          path: dist/*.apk
+
 
