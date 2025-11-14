@@ -1,0 +1,32 @@
+name: Build NanoTrader APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checar repositório
+        uses: actions/checkout@v3
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Instalar Expo CLI
+        run: npm install -g expo-cli eas-cli
+
+      - name: Build APK com EAS
+        run: eas build --platform android --profile preview --local --output nanotrader.apk
+
+      - name: Upload do APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: nanotrader-apk
+          path: nanotrader.apk
